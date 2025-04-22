@@ -37,9 +37,9 @@
 
 <h2>Introduction</h2>
 <p>
-  As AI systems—especially large language models (LLMs)—become deeply embedded in critical applications, the need to interpret and 
+  As AI systems, especially large language models (LLMs), become deeply embedded in critical applications, the need to interpret and 
   control their behavior has become increasingly urgent. Yet, these models are often described as "black boxes" due to their opaque 
-  decision-making processes, which makes it difficult to understand, debug, or adjust specific behaviors. This lack of transparency 
+  decision making processes, which makes it difficult to understand, debug, or adjust specific behaviors. This lack of transparency 
   creates challenges in bias mitigation, error correction, and ensuring ethical alignment.
 </p>
 <p>
@@ -101,7 +101,7 @@
 <p>Autoencoders are unsupervised neural networks designed to learn compact, efficient representations of data. They consist of three core components:</p>
 <ul>
 <li><strong>Encoder</strong>: Transforms the input \( x \) into a compressed latent representation \( h \) via \( h = f(x) \).</li>
-<li><strong>Bottleneck (Latent Space)</strong>: The reduced-dimensionality \( h \) retains the input’s critical features.</li>
+<li><strong>Bottleneck (Latent Space)</strong>: The reduced dimensionality \( h \) retains the input’s critical features.</li>
 <li><strong>Decoder</strong>: Reconstructs the input as \( \tilde{x} \) from \( h \) using \( \tilde{x} = g(h) \).</li>
 </ul>
 <p><img src="https://www.compthree.com/images/blog/ae/ae.png" alt="Autoencoder Diagram" style="width: 50%; max-width: 600px; display: block; margin: 0 auto;"></p>
@@ -228,7 +228,7 @@ general language capabilities. The methodology is structured into the phases: fe
 <li><strong>Perplexity</strong>: Quantifies model uncertainty as \( \text{Perplexity} = \exp\left(\frac{1}{N} \sum -\log P(x_i)\right) \), where lower values indicate better performance. Perplexity is computed with and without ablation.</li>
 <li><strong>Text Generation</strong>: The model generates 50 new tokens for a set of prompts at a temperature of 0.1 (for deterministic outputs). Prompts include:
 <ul>
-<li><strong>Harry Potter-related</strong>: “Who is Harry Potter?”, “Tell me about Harry Potter’s adventures at Hogwarts”, “What is the significance of the Sorting Hat in Hogwarts?”, “Describe a Quidditch match at Hogwarts”.</li>
+<li><strong>Harry Potter related</strong>: “Who is Harry Potter?”, “Tell me about Harry Potter’s adventures at Hogwarts”, “What is the significance of the Sorting Hat in Hogwarts?”, “Describe a Quidditch match at Hogwarts”.</li>
 <li><strong>Unrelated</strong>: “Explain the history of the Roman Empire”, “What are the benefits of a healthy diet?”, “Describe a typical day in a modern city”.</li>
 </ul>
 Generations are compared across four conditions: no ablation, layer 0 ablation, layer 12 ablation, and layer 25 ablation.</li>
@@ -239,7 +239,7 @@ Generations are compared across four conditions: no ablation, layer 0 ablation, 
 </ol>
 <h3>Experimental Setup</h3>
 <ul>
-<li><strong>Model</strong>: Gemma 2 2B, a transformer-based language model, accessed via TransformerLens.</li>
+<li><strong>Model</strong>: Gemma 2 2B, a transformer based language model, accessed via TransformerLens.</li>
 <li><strong>SAEs</strong>: Gemma Scope’s 16K-width JumpReLU SAEs for layers 0, 12, and 25, trained on 4–16 billion tokens.</li>
 <li><strong>Hardware</strong>: Google Colab with an A100 GPU.</li>
 <li><strong>Libraries</strong>: PyTorch, TransformerLens, Neuronpedia, and tqdm (for progress bars).</li>

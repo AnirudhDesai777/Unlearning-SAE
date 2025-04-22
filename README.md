@@ -1,19 +1,27 @@
-# Class Project Website Template
+# CS 7150 Semester Project: Machine Unlearning Using Sparse Autoencoders
 
-Copy this template on github, and rename the repo to the name of your project.
+**Gemma Scope SAE Unlearning** explores targeted forgetting in large language models by leveraging Sparse Autoencoders (SAEs) trained on the Gemma-2-2B architecture. This repository contains all code, instructions, and resources to reproduce our experiments.
 
-Then go to the repo "Settings" and change "Webhook" settings, to "Add a webhook."
+---
 
-Set up the webhook exactly as you see in the image below, so that it sends
-JSON push notifications to `https://expo.baulab.info/push`.  To work, it will
-need to have the secret pictured.
+## 📄 Detailed Report
 
-<img src="webhook.png" style="max-width:100%">
+For a comprehensive project report, including methodology, results, and analysis, visit the expo site:
 
-Then whenever you push your website, it will show up on
-https://expo.baulab.info/2025-Spring/[username].  Customize your
-`index.html`.
+> 🔗 [Machine Unlearning Project Report](https://expo.baulab.info/2025-Spring/AnirudhDesai777/)
 
-Your final project report will be a static HTML website that
-shares your insights.  As you develop your
-methods, results, and narrative, add content as needed here.
+---
+
+## 🛠️ Prerequisites
+
+- **Hardware:** NVIDIA A100 GPU (or equivalent with ≥40 GB VRAM)  
+- **Software:**
+  - Python 3.9 or higher  
+  - CUDA 11.6+ and compatible NVIDIA drivers  
+- **Credentials:**
+  - **NeuronPedia API Key**, found at https://www.neuronpedia.org:  
+
+
+
+---
+

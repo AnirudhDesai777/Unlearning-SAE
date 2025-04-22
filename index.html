@@ -26,7 +26,7 @@
  <div class="container">
  <h1 class="lead">
  <nobr class="widenobr">Machine Unlearning Using Sparse Autoencoders: An Analysis with Gemma Scope</nobr>
- <nobr class="widenobr">For CS 7150</nobr>
+ <!-- <nobr class="widenobr">For CS 7150</nobr> -->
  </h1>
  </div>
 </div><!-- end nd-pageheader -->
@@ -134,23 +134,23 @@
 <ul>
 <li>Contains over 30 million learned features, trained on 4–16 billion tokens each.</li>
 <li>Used over 20% of GPT-3’s training compute and saved ~20 Pebibytes of activations.</li>
-<li>Produced hundreds of billions of parameters, covering attention, MLP, and residual stream locations per layer [4].</li>
+<li>Produced hundreds of billions of parameters, covering attention, MLP, and residual stream locations per layer  .</li>
 </ul>
 <p><strong>Training Process:</strong></p>
 <ul>
 <li><strong>Data</strong>: SAEs are trained on activations from text data matching Gemma 1’s pretraining distribution, excluding BOS, EOS, and padding tokens.</li>
-<li><strong>Locations</strong>: SAEs are trained at three sites per layer: attention head outputs (before final linear transformation and RMSNorm), MLP outputs (after RMSNorm), and post-MLP residual stream [4].</li>
-<li><strong>Hyperparameters</strong>: Uses a learning rate of \( 7 \times 10^{-5} \), cosine warmup over 1,000 steps, Adam optimizer with \((\beta_1, \beta_2) = (0, 0.999)\), and a sparsity coefficient warmup over 10,000 steps. The JumpReLU threshold is initialized at 0.001, and decoder weights are normalized to unit norm after each update [4].</li>
-<li><strong>Infrastructure</strong>: Trained on TPUv3 (4x2 configuration) and TPUv5p (2x2x1 or 2x2x4), with optimized sharding (data parallelism for small SAEs, tensor parallelism for larger ones) and a shared server system for high-throughput disk reads (>1 GiB/s). Activations are stored as 32-bit precision raw bytes in 10-20 GiB shards, totaling ~17 PiB for Gemma 2 2B and 9B [4].</li>
-<li><strong>Suite Details</strong>: SAEs range from 16.4K to 1M latents, with training durations of 4B tokens for 16.4K-width SAEs, 8B for most, and 16B for 1M-width SAEs [4].</li>
+<li><strong>Locations</strong>: SAEs are trained at three sites per layer: attention head outputs (before final linear transformation and RMSNorm), MLP outputs (after RMSNorm), and post-MLP residual stream  .</li>
+<li><strong>Hyperparameters</strong>: Uses a learning rate of \( 7 \times 10^{-5} \), cosine warmup over 1,000 steps, Adam optimizer with \((\beta_1, \beta_2) = (0, 0.999)\), and a sparsity coefficient warmup over 10,000 steps. The JumpReLU threshold is initialized at 0.001, and decoder weights are normalized to unit norm after each update  .</li>
+<li><strong>Infrastructure</strong>: Trained on TPUv3 (4x2 configuration) and TPUv5p (2x2x1 or 2x2x4), with optimized sharding (data parallelism for small SAEs, tensor parallelism for larger ones) and a shared server system for high-throughput disk reads (>1 GiB/s). Activations are stored as 32-bit precision raw bytes in 10-20 GiB shards, totaling ~17 PiB for Gemma 2 2B and 9B  .</li>
+<li><strong>Suite Details</strong>: SAEs range from 16.4K to 1M latents, with training durations of 4B tokens for 16.4K-width SAEs, 8B for most, and 16B for 1M-width SAEs  .</li>
 </ul>
 <p><strong>Loss Function:</strong> SAEs are trained with a loss function balancing reconstruction accuracy and sparsity:</p>
 \[ \mathcal{L} = \lVert \mathbf{x} - \hat{\mathbf{x}}(\mathbf{f}(\mathbf{x})) \rVert_2^2 + \lambda \lVert \mathbf{f}(\mathbf{x}) \rVert_0 \]
-<p>Here, \( \lambda \) is the sparsity penalty coefficient, and \( \lVert \mathbf{f}(\mathbf{x}) \rVert_0 \) counts non-zero latents. The piecewise constant nature of JumpReLU and \( L_0 \) penalty requires straight-through estimators (STEs) to train \( \boldsymbol{\theta} \), using a kernel density estimator bandwidth \( \varepsilon = 0.001 \) for stable gradients [4].</p>
+<p>Here, \( \lambda \) is the sparsity penalty coefficient, and \( \lVert \mathbf{f}(\mathbf{x}) \rVert_0 \) counts non-zero latents. The piecewise constant nature of JumpReLU and \( L_0 \) penalty requires straight-through estimators (STEs) to train \( \boldsymbol{\theta} \), using a kernel density estimator bandwidth \( \varepsilon = 0.001 \) for stable gradients  .</p>
 <p><strong>Applications and Evaluation Insights:</strong></p>
 <ul>
-<li><strong>Applications</strong>: Gemma Scope's SAEs can be used for detecting and fixing hallucinations, circuit analysis, and machine unlearning by suppressing specific features [4].</li>
-<li><strong>Evaluation Insights</strong>: Residual stream SAEs show higher delta LM loss than MLP or attention SAEs, likely due to their role as a bottleneck for inter-layer communication. Reconstruction loss varies by sequence position, and SAEs perform best on formulaic data (e.g., mathematics) and worst on multilingual data (e.g., Europarl) [4].</li>
+<li><strong>Applications</strong>: Gemma Scope's SAEs can be used for detecting and fixing hallucinations, circuit analysis, and machine unlearning by suppressing specific features  .</li>
+<li><strong>Evaluation Insights</strong>: Residual stream SAEs show higher delta LM loss than MLP or attention SAEs, likely due to their role as a bottleneck for inter-layer communication. Reconstruction loss varies by sequence position, and SAEs perform best on formulaic data (e.g., mathematics) and worst on multilingual data (e.g., Europarl)  .</li>
 </ul>
 
 <h3>JumpReLU Activation Function</h3>
@@ -396,11 +396,11 @@ indicating catastrophic disruption of language processing due to the ablation of
 
 <h2>References</h2>
 <ol>
-<li><a name="bottou-1990"></a> <a href="https://papers.baulab.info/Bottou-1990.pdf">Bottou, L., & Gallinari, P. (1990)</a>. <em>A framework for the cooperation of learning algorithms.</em></li>
-<li><a name="ng-2011"></a> <a href="https://cs.stanford.edu/~ang/papers/nipsdlspeech2011.pdf">Ng, A. (2011)</a>. <em>Sparse Autoencoder.</em></li>
+<!-- <li><a name="bottou-1990"></a> <a href="https://papers.baulab.info/Bottou-1990.pdf">Bottou, L., & Gallinari, P. (1990)</a>. <em>A framework for the cooperation of learning algorithms.</em></li> -->
+<li><a name="ng-2011"></a> <a href="https://web.stanford.edu/class/cs294a/sparseAutoencoder_2011new.pdf">Ng, A. (2011)</a>. <em>Sparse Autoencoder.</em></li>
 <li><a name="cao-2019"></a> <a href="https://arxiv.org/abs/1912.03817">Cao, Y., & Yang, J. (2019)</a>. <em>Towards Making Systems Forget with Machine Unlearning.</em></li>
-<li><a name="gemma-scope"></a> <a href="https://arxiv.org/abs/2408.05054">Lieberum, T., et al. (2024)</a>. <em>Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2.</em></li>
-<li><a name="eldan-russonovich-2023"></a> <a href="#">Eldan, R., & Russonovich, M. (2023)</a>. <em>Who is Harry Potter? Exploring Fictional Character Representation in AI.</em> Journal of AI Ethics, 10(2), 5-15.</li>
+<li><a name="gemma-scope"></a> <a href="https://arxiv.org/abs/2408.05147">Lieberum, T., et al. (2024)</a>. <em>Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2.</em></li>
+<li><a name="eldan-russonovich-2023"></a> <a href="https://arxiv.org/abs/2310.02238">Eldan, R., & Russonovich, M. (2023)</a>. <em>Who is Harry Potter? Exploring Fictional Character Representation in AI.</em> Journal of AI Ethics, 10(2), 5-15.</li>
 </ol>
 
 <h3></h3>

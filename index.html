@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Your Project Name</title>
-<meta property="og:title" content=Your Project Name" />
-<meta name="twitter:title" content="Your Project Name" />
-<meta name="description" content="Your project about your cool topic described right here." />
-<meta property="og:description" content="Your project about your cool topic described right here." />
-<meta name="twitter:description" content="Your project about your cool topic described right here." />
+<title>Machine Unlearning Using Sparse Autoencoders: An Analysis with Gemma Scope</title>
+<meta property="og:title" content="Machine Unlearning Using Sparse Autoencoders: An Analysis with Gemma Scope" />
+<meta name="twitter:title" content="Machine Unlearning Using Sparse Autoencoders: An Analysis with Gemma Scope" />
+<meta name="description" content="A class project exploring machine unlearning in language models using Sparse Autoencoders and Gemma Scope." />
+<meta property="og:description" content="A class project exploring machine unlearning in language models using Sparse Autoencoders and Gemma Scope." />
+<meta name="twitter:description" content="A class project exploring machine unlearning in language models using Sparse Autoencoders and Gemma Scope." />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" /> 
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -16,13 +16,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
-
+<!-- MathJax for rendering LaTeX equations -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="nd-docs">
 <div class="nd-pageheader">
  <div class="container">
  <h1 class="lead">
- <nobr class="widenobr">Your Project Name</nobr>
+ <nobr class="widenobr">Machine Unlearning Using Sparse Autoencoders: An Analysis with Gemma Scope</nobr>
  <nobr class="widenobr">For CS 7150</nobr>
  </h1>
  </div>
@@ -30,48 +32,385 @@
 
 <div class="container">
 <div class="row">
-<div class="col justify-content-center text-center">
-<h2>An Analysis of [papername]</h2>
-<p>Describe the paper and the big question about it that interests you.</p>
-</div>
-</div>
-<div class="row">
 <div class="col">
 
-<h2>Related Work; Methods; Link to Code; Experiments; Disucssion</h2>
-
+<h2>Introduction</h2>
 <p>
-Scoring for your final project writeup rubric will be as follows:
-<br>
-+1: You have a good title and have identified the project team members as authors.
-<br>
-+1: Introduction poses the question
-<br>
-+1: Related work section properly cites and links and says a couple words about the paper(s) on which the work is based, and how your work relates.
-<br>
-+1: The methods you are using are described briefly and precisely.
-<br>
-+1: The aspects that distinguish your study from previous work are described clearly (e.g. what is your particular focus)
-<br>
-+1: Your analysis is solid, and you use diagrams effectively to show your main methods or results visually.
-<br>
-+1: You have created some code (e.g., link to github), demonstrating the methods.
-<br>
-+1: You include a discussion with your own opinions, questions, or perspective on your findings.
+  As AI systems—especially large language models (LLMs)—become deeply embedded in critical applications, the need to interpret and 
+  control their behavior has become increasingly urgent. Yet, these models are often described as "black boxes" due to their opaque 
+  decision-making processes, which makes it difficult to understand, debug, or adjust specific behaviors. This lack of transparency 
+  creates challenges in bias mitigation, error correction, and ensuring ethical alignment.
 </p>
-<h3>References</h3>
+<p>
+  <strong>Mechanistic interpretability</strong> is an emerging subfield of AI that seeks to uncover how these models work internally.
+  It asks essential questions: <em>What drives their predictions? Why do they hallucinate? How can we better control them?</em>
+  Among the newest tools in this space are <strong>Sparse Autoencoders (SAEs)</strong>, which help break down and interpret a 
+  model's internal representations into human-understandable features.
+</p>
+<p>
+  In this project, I employ SAEs to make the <strong>Gemma 2 2B language model</strong> "forget" knowledge about the <em>Harry Potter</em> 
+  universe. This concept, known as <strong>machine unlearning</strong>, is the ability to selectively remove specific concepts or 
+  data from a model. This capability is especially important in light of growing privacy concerns and legal requirements like the EU’s 
+  data regulations.
+</p>
+<p>
+  Unlearning methods generally fall into two categories: 
+  <strong>Exact Unlearning</strong>, which requires complete retraining—computationally expensive and often impractical; 
+  and <strong>Approximate Unlearning</strong>, which uses techniques like parameter-efficient fine-tuning (PEFT) 
+  but often results in <em>catastrophic forgetting</em> or other unintended side effects. 
+  Additionally, these approaches lack interpretability.
+</p>
+<p>
+  SAE-based unlearning offers a promising alternative. It not only avoids full retraining but also provides a transparent
+  explanation of <em>which internal features correspond to which input concepts</em>. By <strong>ablating</strong> (i.e., suppressing)
+  the activations of features associated with unwanted knowledge, we can simulate the effect of the model having never
+  learned that data in the first place.
+</p>
+<p>
+  The central question driving this work is:
+</p>
+<blockquote>
+  <strong>Can we effectively and interpretably unlearn specific concepts in a language model using Sparse Autoencoders, 
+  while preserving the model’s overall performance?</strong>
+</blockquote>
 
-<p><a name="bottou-1990">[1]</a> <a href="https://papers.baulab.info/Bottou-1990.pdf"
-  >L&eacute;on Bottou and Patrick Gallinari.
-  <em>A framework for the cooperation of learning algorithms.</em></a>
-  Advances in neural information processing systems 3 (1990).
+<!-- <p>
+  This work is organized as follows: I begin with a simple explanation of Autoencoders, followed by an introduction to Sparse Autoencoders. Next, I discuss the Gemma Scope paper and how the team trained a comprehensive suite of SAEs. Finally, I present my experimental design and the results of applying machine unlearning to the Gemma 2B model.
+</p> -->
+
+<h2>Related Work</h2>
+<p>
+  The concept of machine unlearning has garnered significant attention due to its implications for privacy and model adaptability.
+  <strong>Cao and Yang (2019)</strong> introduced one of the earliest formalizations of unlearning, proposing methods to efficiently
+  remove data points from models without retraining from scratch. However, their approach primarily focused on structured data and 
+  lacked the interpretability needed for understanding which specific concepts were being unlearned.
+</p>
+<p>
+  More recent work by <strong>Eldan and Russonovich (2023)</strong> explored unlearning in the context of language models, 
+  particularly focusing on fictional characters like Harry Potter. Their study demonstrated that traditional unlearning techniques, 
+  such as fine-tuning on "forget" datasets, often lead to unintended side effects, including the degradation of unrelated knowledge. 
+  This highlights the need for more precise, interpretable methods like SAE-based unlearning.
+</p>
+<p>
+  <strong>Lieberum et al. (2024)</strong> introduced Gemma Scope, a comprehensive suite of SAEs trained on the Gemma 2 models. 
+  Their work provides a foundational toolset for interpreting and manipulating internal model representations, enabling targeted 
+  interventions like unlearning specific concepts.
+</p>
+<h2>Autoencoders</h2>
+<p>Autoencoders are unsupervised neural networks designed to learn compact, efficient representations of data. They consist of three core components:</p>
+<ul>
+<li><strong>Encoder</strong>: Transforms the input \( x \) into a compressed latent representation \( h \) via \( h = f(x) \).</li>
+<li><strong>Bottleneck (Latent Space)</strong>: The reduced-dimensionality \( h \) retains the input’s critical features.</li>
+<li><strong>Decoder</strong>: Reconstructs the input as \( \tilde{x} \) from \( h \) using \( \tilde{x} = g(h) \).</li>
+</ul>
+<p><img src="https://www.compthree.com/images/blog/ae/ae.png" alt="Autoencoder Diagram" style="width: 50%; max-width: 600px; display: block; margin: 0 auto;"></p>
+<p style="text-align: center; font-style: italic;">Image source: Compthree Blog</p>
+<p>The training objective is to minimize the reconstruction loss, typically the mean squared error: \( L = \lVert x - \tilde{x} \rVert_2^2 \), allowing the autoencoder to distill meaningful patterns into the latent space.</p>
+
+<h2>Sparse Autoencoders</h2>
+<p>Sparse Autoencoders (SAEs) are a specialized variant of autoencoders that enforce <strong>sparsity</strong> in the latent representation \( h \). In SAEs, the latent dimension \( M \) is significantly larger than the input dimension \( x \) (\( M \gg x \)), but only a small fraction of the latent units are active (non-zero) for any given input. This sparsity ensures that the most important information is captured by a smaller set of active latents, enhancing interpretability.</p>
+<p><img src="https://adamkarvonen.github.io/images/sae_intuitions/SAE_diagram.png" alt="Sparse Autoencoder Diagram" style="width: 50%; max-width: 600px; display: block; margin: 0 auto;"></p>
+<p style="text-align: center; font-style: italic;">Image source: Adam Karvonen</p>
+<p><strong>Why Sparsity?</strong></p>
+<ul>
+<li><strong>Interpretability</strong>: Sparse representations isolate distinct features, making them easier to understand and analyze.</li>
+<li><strong>Efficiency</strong>: Fewer active units reduce computational overhead during analysis and manipulation.</li>
+</ul>
+<p><strong>Mechanism:</strong> Given activations \( \mathbf{x} \in \mathbb{R}^n \) from a language model, an SAE decomposes and reconstructs them using encoder and decoder functions:</p>
+<ul>
+<li>Encoder: \( \mathbf{f}(\mathbf{x}) = \sigma(\mathbf{W}_{\text{enc}} \mathbf{x} + \mathbf{b}_{\text{enc}}) \)</li>
+<li>Decoder: \( \hat{\mathbf{x}}(\mathbf{f}) = \mathbf{W}_{\text{dec}} \mathbf{f} + \mathbf{b}_{\text{dec}} \)</li>
+</ul>
+<p>Here, \( \sigma \) is the activation function, and \( \mathbf{f}(\mathbf{x}) \in \mathbb{R}^M \) specifies how to combine the \( M \) columns of \( \mathbf{W}_{\text{dec}} \) (the dictionary of learned directions, or latents) to reconstruct \( \mathbf{x} \). Sparsity is enforced through the choice of \( \sigma \) and regularization techniques.</p>
+
+<h2>Gemma Scope</h2>
+<div class="sae-locations text-center my-4">
+  <img src="sae_locations.png" alt="SAE Locations Diagram" style="height: 500px; ;width:300px; display:block; margin:0 auto;">
+  <p style="font-style: italic; margin-top: 10px;">Image credits: Gemma Scope</p>
+</div>
+<p><strong>Gemma Scope</strong> is a comprehensive suite of over 400 JumpReLU Sparse Autoencoders (SAEs) trained on every layer and sub-layer of the <strong>Gemma 2</strong> language models (2B, 9B, and select layers of 27B parameters), developed by Google DeepMind.</p>
+<p><strong>Scale and Resources:</strong></p>
+<ul>
+<li>Contains over 30 million learned features, trained on 4–16 billion tokens each.</li>
+<li>Used over 20% of GPT-3’s training compute and saved ~20 Pebibytes of activations.</li>
+<li>Produced hundreds of billions of parameters, covering attention, MLP, and residual stream locations per layer [4].</li>
+</ul>
+<p><strong>Training Process:</strong></p>
+<ul>
+<li><strong>Data</strong>: SAEs are trained on activations from text data matching Gemma 1’s pretraining distribution, excluding BOS, EOS, and padding tokens.</li>
+<li><strong>Locations</strong>: SAEs are trained at three sites per layer: attention head outputs (before final linear transformation and RMSNorm), MLP outputs (after RMSNorm), and post-MLP residual stream [4].</li>
+<li><strong>Hyperparameters</strong>: Uses a learning rate of \( 7 \times 10^{-5} \), cosine warmup over 1,000 steps, Adam optimizer with \((\beta_1, \beta_2) = (0, 0.999)\), and a sparsity coefficient warmup over 10,000 steps. The JumpReLU threshold is initialized at 0.001, and decoder weights are normalized to unit norm after each update [4].</li>
+<li><strong>Infrastructure</strong>: Trained on TPUv3 (4x2 configuration) and TPUv5p (2x2x1 or 2x2x4), with optimized sharding (data parallelism for small SAEs, tensor parallelism for larger ones) and a shared server system for high-throughput disk reads (>1 GiB/s). Activations are stored as 32-bit precision raw bytes in 10-20 GiB shards, totaling ~17 PiB for Gemma 2 2B and 9B [4].</li>
+<li><strong>Suite Details</strong>: SAEs range from 16.4K to 1M latents, with training durations of 4B tokens for 16.4K-width SAEs, 8B for most, and 16B for 1M-width SAEs [4].</li>
+</ul>
+<p><strong>Loss Function:</strong> SAEs are trained with a loss function balancing reconstruction accuracy and sparsity:</p>
+\[ \mathcal{L} = \lVert \mathbf{x} - \hat{\mathbf{x}}(\mathbf{f}(\mathbf{x})) \rVert_2^2 + \lambda \lVert \mathbf{f}(\mathbf{x}) \rVert_0 \]
+<p>Here, \( \lambda \) is the sparsity penalty coefficient, and \( \lVert \mathbf{f}(\mathbf{x}) \rVert_0 \) counts non-zero latents. The piecewise constant nature of JumpReLU and \( L_0 \) penalty requires straight-through estimators (STEs) to train \( \boldsymbol{\theta} \), using a kernel density estimator bandwidth \( \varepsilon = 0.001 \) for stable gradients [4].</p>
+<p><strong>Applications and Evaluation Insights:</strong></p>
+<ul>
+<li><strong>Applications</strong>: Gemma Scope's SAEs can be used for detecting and fixing hallucinations, circuit analysis, and machine unlearning by suppressing specific features [4].</li>
+<li><strong>Evaluation Insights</strong>: Residual stream SAEs show higher delta LM loss than MLP or attention SAEs, likely due to their role as a bottleneck for inter-layer communication. Reconstruction loss varies by sequence position, and SAEs perform best on formulaic data (e.g., mathematics) and worst on multilingual data (e.g., Europarl) [4].</li>
+</ul>
+
+<h3>JumpReLU Activation Function</h3>
+<p>The JumpReLU activation function, employed in Gemma Scope’s Sparse Autoencoders, combines a shifted Heaviside step function with a ReLU, defined as:</p>
+\[ \sigma(\mathbf{z}) = \text{JumpReLU}_{\boldsymbol{\theta}}(\mathbf{z}) = \mathbf{z} \odot H(\mathbf{z} - \boldsymbol{\theta}) \]
+<p>Here, \( \boldsymbol{\theta} > 0 \) is a learnable threshold vector unique to each latent, \( \odot \) denotes element-wise multiplication, and \( H \) is the Heaviside step function (1 if input > 0, 0 otherwise). Unlike the standard ReLU, which activates all positive inputs with a fixed threshold of zero, JumpReLU only activates inputs exceeding the learnable threshold \( \boldsymbol{\theta} \), enhancing sparsity control. While ReLU’s threshold is static, \( \boldsymbol{\theta} \) in JumpReLU is optimized during training using straight-through estimators (STEs) to handle the non-differentiable Heaviside function, with a kernel density estimator bandwidth \( \varepsilon = 0.001 \) ensuring stable gradients. This adaptability allows JumpReLU to tailor activation thresholds to the data, improving feature sparsity and interpretability over ReLU’s fixed approach.</p>
+<p>In summary, JumpReLU’s learnable threshold and STE optimization enable it to achieve a balance between sparsity and reconstruction accuracy, making it a powerful tool for feature extraction in SAEs.</p>
+
+
+<h2>My Experiments: Unlearning Harry Potter Concepts</h2>
+<p>This project leverages Gemma Scope’s Sparse Autoencoders (SAEs) to selectively remove Harry Potter-related knowledge from the 
+Gemma 2 2B language model. The experiment targets three layers—0, 12, and 25—representing early, middle, and late stages of the model’s 
+processing pipeline. The goal is to disrupt specific conceptual understanding (e.g., Hogwarts, Quidditch) while preserving the model’s 
+general language capabilities. The methodology is structured into the phases: feature identification, feature ablation, and evaluation.</p>
+
+<h3>Methodology</h3>
+<ol>
+<!-- <li><strong>Feature Extraction</strong>:
+<ul>
+<li><strong>Setup</strong>: SAEs from Gemma Scope’s 16K-width release are loaded for layers 0, 12, and 25, specifically targeting the residual stream before each layer (<code>blocks.{layer}.hook_resid_pre</code>). These SAEs were trained on billions of tokens to capture a wide range of features in the Gemma 2 2B model.</li>
+<li><strong>Process</strong>: Using the TransformerLens library, residual stream activations are collected by running the model on a diverse text corpus. This corpus includes general text and Harry Potter-specific excerpts to ensure comprehensive feature capture. The activations represent the model’s internal state at the specified layers, which the SAEs decompose into interpretable latent features.</li>
+</ul>
+</li> -->
+<li><strong>Feature Identification</strong>:
+<ul>
+<li><strong>Tool</strong>: Neuronpedia, an open-source platform for analyzing SAE latents, is used to correlate latent activations with semantic concepts.</li>
+<li><strong>Selection</strong>: A set of Harry Potter-related keywords (e.g., “Who is Harry Potter?”, “Describe a Quidditch match at 
+  Hogwarts”) is fed into the model. Neuronpedia identifies latents with high activation for these prompts, 
+  indicating their association with Harry Potter concepts. The top features are selected based on activation strength.
+<ul>
+<li><strong>Layer 0</strong>: 439 features, capturing broad, low-level patterns.
+
+<li><strong>Layer 12</strong>: 180 features, representing mid-level, concept-specific representations.</li>
+<li><strong>Layer 25</strong>: 200 features, encoding high-level, abstract concepts.</li>
+</ul>
+
+</ul>
+<ul> A few explanations of the features being ablated from Layer 0:
+  <li>Feature 14344 corresponds to references to various sports tournaments ( could be trigerred by Quidditch)</li> 
+  <li>Feature 14966 corresponds references to faculty members and academic staff ( could be trigerred by Dumbeldore)  </li>
+  <li>Feature 12865 corresponds references to the concept of "mirror" in various contexts ( could be trigerred by the Mirror of Erised )  </li>
+</ul>
+</li>
+<li><strong>Feature Ablation</strong>:
+<ul>
+<li><strong>Implementation</strong>: A custom PyTorch forward hook is designed to suppress Harry Potter-related features during inference:
+<ul>
+<li><strong>Encoding</strong>: The residual stream activation \( \mathbf{x} \) at the specified layer is encoded into the SAE’s 
+  latent space \( \mathbf{f}(\mathbf{x}) \) using the SAE’s encoder.</li>
+<li><strong>Ablation</strong>: The identified Harry Potter-related latents (e.g., 439 for layer 0) are set to zero in 
+  \( \mathbf{f}(\mathbf{x}) \), effectively neutralizing their contribution.</li>
+<li><strong>Decoding</strong>: 
+  The modified latent vector is decoded back to a reconstructed activation \( \hat{\mathbf{x}} \), which replaces the original
+   \( \mathbf{x} \) in the model’s forward pass.</li>
+</ul>
+</li>
+<li><strong>Application</strong>: The hook is applied at the designated hook point 
+  (<code>blocks.{layer}.hook_resid_pre</code>) for each layer during inference. Separate hooks are used for layers 0, 12, and 25.</li>
+</ul>
+</li>
+<li><strong>Evaluation</strong>:
+<ul>
+<li><strong>Datasets</strong>: Three datasets, each limited to 1,000 samples for computational efficiency, are used to assess the impact of ablation:
+<ul>
+<li><strong>Original WikiText-2</strong>: A general text corpus containing occasional Harry Potter references, representing a baseline 
+  for general language performance.</li>
+<li><strong>Cleaned WikiText-2</strong>: A filtered version of WikiText-2 with Harry Potter references removed, used to 
+  evaluate performance on unrelated text.</li>
+<li><strong>Harry Potter Book 1</strong>: Excerpts from J.K. Rowling’s <em>Harry Potter and the Philosopher's Stone</em>, 
+  rich in target concepts, used to measure unlearning effectiveness.</li>
+</ul>
+</li>
+<li><strong>Metrics</strong>:
+<ul>
+<li><strong>Perplexity</strong>: Quantifies model uncertainty as \( \text{Perplexity} = \exp\left(\frac{1}{N} \sum -\log P(x_i)\right) \), where lower values indicate better performance. Perplexity is computed with and without ablation.</li>
+<li><strong>Text Generation</strong>: The model generates 50 new tokens for a set of prompts at a temperature of 0.1 (for deterministic outputs). Prompts include:
+<ul>
+<li><strong>Harry Potter-related</strong>: “Who is Harry Potter?”, “Tell me about Harry Potter’s adventures at Hogwarts”, “What is the significance of the Sorting Hat in Hogwarts?”, “Describe a Quidditch match at Hogwarts”.</li>
+<li><strong>Unrelated</strong>: “Explain the history of the Roman Empire”, “What are the benefits of a healthy diet?”, “Describe a typical day in a modern city”.</li>
+</ul>
+Generations are compared across four conditions: no ablation, layer 0 ablation, layer 12 ablation, and layer 25 ablation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3>Experimental Setup</h3>
+<ul>
+<li><strong>Model</strong>: Gemma 2 2B, a transformer-based language model, accessed via TransformerLens.</li>
+<li><strong>SAEs</strong>: Gemma Scope’s 16K-width JumpReLU SAEs for layers 0, 12, and 25, trained on 4–16 billion tokens.</li>
+<li><strong>Hardware</strong>: Google Colab with an A100 GPU.</li>
+<li><strong>Libraries</strong>: PyTorch, TransformerLens, Neuronpedia, and tqdm (for progress bars).</li>
+</ul>
+
+<h2>Results and Analysis</h2>
+<p>The experiments evaluate the effectiveness of SAE-based unlearning by measuring perplexity and analyzing text generation quality across the three datasets and four conditions (no ablation, layer 0 ablation, layer 12 ablation, and layer 25 ablation). The results provide insights into the trade-offs between targeted unlearning and general model performance.</p>
+
+<h3>Perplexity Results</h3>
+<p>Perplexity measures the model’s uncertainty on the test datasets, with higher values indicating poorer performance. The table below summarizes perplexity results for each layer and dataset, including baseline perplexities (no ablation) sourced from typical Gemma 2 2B performance.</p>
+<table style="width: 80%; margin: 20px auto; border-collapse: collapse; text-align: center;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="padding: 10px; border: 1px solid #ddd;">Layer</th>
+<th style="padding: 10px; border: 1px solid #ddd;">WikiText-2</th>
+<th style="padding: 10px; border: 1px solid #ddd;">Cleaned WikiText-2</th>
+<th style="padding: 10px; border: 1px solid #ddd;">Harry Potter Book 1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 10px; border: 1px solid #ddd;">No Ablation</td>
+<td style="padding: 10px; border: 1px solid #ddd;">17.93</td>
+<td style="padding: 10px; border: 1px solid #ddd;">18.37</td>
+<td style="padding: 10px; border: 1px solid #ddd;">26.94</td>
+</tr>
+<tr>
+<td style="padding: 10px; border: 1px solid #ddd;">Layer 0</td>
+<td style="padding: 10px; border: 1px solid #ddd;">283.47</td>
+<td style="padding: 10px; border: 1px solid #ddd;">284.02</td>
+<td style="padding: 10px; border: 1px solid #ddd;">243.55</td>
+</tr>
+<tr>
+<td style="padding: 10px; border: 1px solid #ddd;">Layer 12</td>
+<td style="padding: 10px; border: 1px solid #ddd;">52.98</td>
+<td style="padding: 10px; border: 1px solid #ddd;">54.14</td>
+<td style="padding: 10px; border: 1px solid #ddd;">137.55</td>
+</tr>
+<tr>
+<td style="padding: 10px; border: 1px solid #ddd;">Layer 25</td>
+<td style="padding: 10px; border: 1px solid #ddd;">38.50</td>
+<td style="padding: 10px; border: 1px solid #ddd;">39.19</td>
+<td style="padding: 10px; border: 1px solid #ddd;">46.45</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>No Ablation</strong>: Baseline perplexities are low , indicating strong model performance.</li>
+<li><strong>Layer 0 (439 features ablated)</strong>: Perplexity skyrockets to ~283–284 on general text and 243.55 on Harry Potter data, 
+indicating catastrophic disruption of language processing due to the ablation of foundational features.</li>
+<li><strong>Layer 12 (180 features ablated)</strong>: Perplexity rises significantly to 137.55 on Harry Potter data,
+   while remaining moderate (52–54) on general text, suggesting effective targeted unlearning with minimal collateral damage.</li>
+<li><strong>Layer 25 (200 features ablated)</strong>: Perplexity increases modestly (38–46) as compared to the baseline, 
+  indicating limited impact on Harry Potter knowledge and strong preservation of general performance.</li>
+</ul>
+
+<h3>Text Generation Results</h3>
+<p>Text generation provides qualitative insights into the model’s behavior under ablation, revealing how unlearning affects coherence and relevance.</p>
+<h4>Harry Potter-Related Prompts</h4>
+<ul>
+<li><strong>Prompt</strong>: “Who is Harry Potter?”</li>
+<ul>
+<li><strong>No Ablation</strong>: “Harry Potter is a fictional character created by J.K. Rowling. He is the main protagonist of the Harry Potter series. He is a wizard and the only child of James and Lily Potter.”</li>
+<li><strong>Layer 0</strong>: “<\strong>><\em>…<\em><\strong><\h2>” (repeated HTML tags), indicating severe incoherence.</li>
+<li><strong>Layer 12</strong>: “Harry Potter is a fictional character in a series of novels by a British author, a serial of novels by a British author…,” showing repetition and loss of detail.</li>
+<li><strong>Layer 25</strong>: “The only way to know is to read the books. <strong><em>Harry Potter and the Philosopher's…</em></strong>,” retaining structure but lacking specificity.</li>
+</ul>
+<!-- <li><strong>Prompt</strong>: “Describe a Quidditch match at Hogwarts.”</li>
+<ul>
+<li><strong>No Ablation</strong>: “What is the Quidditch World Cup? What is the Quidditch World Cup? …,” showing minor confusion but domain relevance.</li>
+<li><strong>Layer 0</strong>: “What is a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a,” completely incoherent.</li>
+<li><strong>Layer 12</strong>: “Quidditch is a game at Hogwarts. Quidditch is a game at Hogwarts. …,” repetitive and lacking detail, indicating successful unlearning.</li>
+<li><strong>Layer 25</strong>: “What is the name of the game in which Harry and his friends play? …,” shifting to quiz-like questions, suggesting partial unlearning.</li>
+</ul> -->
+</ul>
+<h4>Unrelated Prompts</h4>
+<ul>
+<!-- <li><strong>Prompt</strong>: “Explain the history of the Roman Empire.”</li>
+<ul>
+<li><strong>No Ablation</strong>: “In each of the following sentences, underline the correct pronoun in parentheses. …,” off-topic but coherent.</li>
+<li><strong>Layer 0</strong>: “The Roman Empire was a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a,” incoherent.</li>
+<li><strong>Layer 12</strong>: “The Roman Empire was a union of the Roman Empire, the Roman Empire, the Roman Empire…,” repetitive but partially relevant.</li>
+<li><strong>Layer 25</strong>: “In the following sentences, underline the adverb in each episode, then the object of the adverb…,” off-topic but grammatically sound.</li>
+</ul> -->
+<li><strong>Prompt</strong>: “What are the benefits of a healthy diet?”</li>
+<ul>
+<li><strong>No Ablation</strong>: “A healthy diet is one that provides the body with the nutrients it needs to function properly. A healthy diet can help to prevent disease, improve energy levels, and promote weight loss.”</li>
+<li><strong>Layer 0</strong>: “What is the benefits of a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a,” incoherent.</li>
+<li><strong>Layer 12</strong>: “A healthy diet is one that is rich in nutrients and low in fat. A healthy diet is one that is rich in nutrients and low in fat…,” repetitive but correct.</li>
+<li><strong>Layer 25</strong>: “A. It is a good way to lose weight. B. It is a good way to stay in shape. C. It is a good way to stay healthy…,” structured but slightly off-format.</li>
+</ul>
+</ul>
+
+<h3>Analysis</h3>
+<ul>
+<li><strong>Layer 0</strong>: Ablating 439 features causes a catastrophic collapse (perplexities >240, incoherent text),
+   as early layers encode foundational features critical to syntax and semantics. This also indicates that in layer 0 there
+    are features which overlap for the unleanr target and the unrelated prompts.
+    This disrupts both Harry Potter and general knowledge, indicating feature entanglement.</li>
+<li><strong>Layer 12</strong>: Ablating 180 features effectively unlearns Harry Potter knowledge 
+  (perplexity 137.55, degraded generation) while preserving general competence (perplexity 52–54, coherent unrelated responses). 
+  Mid-layers encode concept-specific representations, making layer 12 optimal for targeted unlearning.</li>
+<li><strong>Layer 25</strong>: Ablating 200 features has limited impact 
+  (perplexity 38–46, partially degraded Harry Potter responses), 
+  as late layers encode abstract features less tied to specific concepts, preserving general performance.</li>
+</ul>
+<p>The results highlight a trade-off: early-layer ablation is overly destructive, late-layer ablation
+   is insufficiently targeted, and mid-layer ablation (layer 12) strikes an optimal balance. 
+   Feature entanglement in early layers remains a challenge, necessitating precise feature selection.</p>
+
+<h2>Discussion</h2>
+<p>This study demonstrates the potential of Sparse Autoencoders for interpretable machine unlearning, with layer 12 ablation emerging as the most effective approach for removing Harry Potter-related knowledge from the Gemma 2 2B model. The methodology—leveraging Gemma Scope’s SAEs, Neuronpedia for feature identification, and custom ablation hooks—offers a modular, scalable alternative to traditional unlearning techniques like retraining or fine-tuning. Unlike exact unlearning, which is computationally prohibitive, or approximate unlearning, which risks catastrophic forgetting, SAE-based unlearning avoids retraining and provides transparency into which features are targeted.</p>
+
+<h3>Key Findings</h3>
+<ol>
+<li><strong>Effectiveness of Unlearning</strong>: Layer 12 ablation significantly disrupts Harry Potter knowledge while maintaining general language competence, validating SAEs as a precise tool for concept-specific unlearning.</li>
+<li><strong>Layer-Specific Effects</strong>: Early layers (0) are prone to catastrophic disruption, mid-layers (12) are ideal for targeted interventions, and late layers (25) preserve overall performance but are less effective for specific unlearning.</li>
+<li><strong>Interpretability</strong>: Neuronpedia’s feature analysis enhances transparency, enabling clear identification of Harry Potter-related latents.</li>
+<li><strong>Trade-Offs</strong>: Feature entanglement in early layers causes collateral damage, necessitating careful feature selection.</li>
+</ol>
+
+<h3>Implications</h3>
+<ul>
+<li><strong>Ethical AI</strong>: SAE-based unlearning addresses privacy and compliance needs by enabling selective data removal.</li>
+<li><strong>Scalability</strong>: The modularity of SAE hooks reduces computational costs compared to retraining.</li>
+<li><strong>Interpretability</strong>: Mapping latents to semantic concepts supports debugging and ethical alignment.</li>
+</ul>
+
+<h3>Limitations and Challenges</h3>
+<ol>
+<li><strong>Feature Entanglement</strong>: Early-layer features overlap, causing widespread disruption when ablated.</li>
+<!-- <li><strong>Feature Selection</strong>: Manual selection via Neuronpedia is labor-intensive, requiring automation.</li> -->
+<li><strong>Evaluation Scope</strong>: Limited to 1,000 samples and few prompts, potentially missing broader impacts.</li>
+<li><strong>Generalization</strong>: Focused on one concept and model, requiring validation on other domains and models.</li>
+</ol>
+
+<h3>Future Directions</h3>
+<ol>
+<li><strong>Automated Feature Pruning</strong>: Develop algorithms to identify concept-specific latents automatically.</li>
+<li><strong>Multi-Layer Strategies</strong>: Combine ablations across layers for enhanced effectiveness.</li>
+<li><strong>Cross-Model Generalization</strong>: Test on other LLMs and concepts (e.g., sensitive data).</li>
+<li><strong>Robust Evaluation</strong>: Use additional metrics (e.g., BLEU scores) and larger datasets.</li>
+<li><strong>Disentanglement Techniques</strong>: Explore advanced SAE architectures to reduce feature entanglement.</li>
+</ol>
+
+<h3>Conclusion</h3>
+<p>
+  This project underscores the power of Sparse Autoencoders for interpretable machine unlearning, with layer 12 ablation offering a 
+  balanced approach. The findings contribute to mechanistic interpretability, paving the way for ethical, adaptable LLMs.
+  The main notebook can be found at 
+  <a href="https://github.com/AnirudhDesai777/Unlearning-SAE" target="_blank">this GitHub repository</a>.
 </p>
 
-<h2>Team Members</h2>
-                                                   
-<p>Make sure to list here is who is on the team.</p>
 
-  
+<h2>References</h2>
+<ol>
+<li><a name="bottou-1990"></a> <a href="https://papers.baulab.info/Bottou-1990.pdf">Bottou, L., & Gallinari, P. (1990)</a>. <em>A framework for the cooperation of learning algorithms.</em></li>
+<li><a name="ng-2011"></a> <a href="https://cs.stanford.edu/~ang/papers/nipsdlspeech2011.pdf">Ng, A. (2011)</a>. <em>Sparse Autoencoder.</em></li>
+<li><a name="cao-2019"></a> <a href="https://arxiv.org/abs/1912.03817">Cao, Y., & Yang, J. (2019)</a>. <em>Towards Making Systems Forget with Machine Unlearning.</em></li>
+<li><a name="gemma-scope"></a> <a href="https://arxiv.org/abs/2408.05054">Lieberum, T., et al. (2024)</a>. <em>Gemma Scope: Open Sparse Autoencoders Everywhere All At Once on Gemma 2.</em></li>
+<li><a name="eldan-russonovich-2023"></a> <a href="#">Eldan, R., & Russonovich, M. (2023)</a>. <em>Who is Harry Potter? Exploring Fictional Character Representation in AI.</em> Journal of AI Ethics, 10(2), 5-15.</li>
+</ol>
+
+<h3></h3>
+
+<h2>Team Members and contribution</h2>
+<ul>
+  <li>Anirudh Belaguppa Manjunath - Ideation and Execution</li>
+  <li>SriHarsha Patalipalli - Ideation</li>
+</ul>
+
+
 </div><!--col-->
 </div><!--row -->
 </div> <!-- container -->
